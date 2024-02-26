@@ -1,0 +1,128 @@
+﻿@using Microsoft.EntityFrameworkCore
+@model ButModel
+
+@{
+    string chatid = "";
+    try
+    {
+        var path = ViewContext.HttpContext.Request.Path.ToString();
+        var splits = path.Split('/');
+        chatid = splits.Last();
+    }
+    catch{}
+}
+
+<body style="z-index:10;">
+    
+
+    @{
+        List<TelegramUser> tusers = new List<TelegramUser>();
+        var options = new DbContextOptionsBuilder<ApplicationContext>()
+        .UseSqlite("Data Source=data.db").Options;
+        using (var dbContext = new ApplicationContext(options))
+        {
+            tusers = dbContext.TelegramUsers.ToList();
+        }
+    }
+
+    @if(chatid=="" || chatid == "But")
+    {
+        <h3>Контакты</h3>
+        @foreach (TelegramUser tu in tusers)
+        {
+            <form asp-controller="Bot" asp-action="But" asp-route-id="@tu.Id" asp-antiforgery="false">
+                <div>
+
+                    @* <input  asp-for="Text" value="" hidden /> *@
+                    <input type="submit" value="@tu.UserName" />
+                </div>
+            </form>
+        }
+    }
+    else
+    {
+        <form id="msgform" asp-controller="Bot" asp-action="But" method="post" enctype="multipart/form-data">
+            <div>
+                <input id="id" asp-for="Id" value="@chatid" hidden style="width: 320px" />
+                <label>Текст сообщения </label>
+                <input id="msgtext" asp-for="Text" style="width: 320px" />
+                <br />
+                <br />
+                <label>Прикрепить фотографию </label>
+                <input asp-for="FormFile" type="file" />
+                <br />
+                <br />
+                <input type="submit" value="Отправить" id="reset" onclick="clearText()" />
+            </div>
+
+
+        </form>
+
+        <br />
+        <p>История сообщений</p>
+
+        <div id="targetdiv" style="display: none"></div>
+
+
+        <hr />
+        <div id="clonediv"></div>
+    }
+
+
+    @* <script>
+        
+        function clearText(event) {
+            // access input field
+            let input1 = document.getElementById('msgtext');
+            // clear the input field.
+            input1.value = "";
+        }
+    </script> *@
+
+    
+</body>
+
+
+
+@* <h3>@chatid</h3> *@
+
+
+@section Scripts
+{
+   
+        
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            window.setInterval(function () {
+                $('#targetdiv').children().remove();
+                $('targetdiv').remove();
+                $('#targetdiv').html("");
+                $("#targetdiv").load("/Bot/PartialBut/@chatid");
+
+            }, 500);
+
+            $.ajaxSetup({ cache: false });
+        });
+
+        setInterval(function () {
+            
+            var a = document.getElementById("targetdiv").innerHTML;
+            console.log(a);
+
+            var aa = document.getElementById("clonediv").innerHTML;
+            console.log(aa);
+
+            if(a!=aa){
+                document.getElementById("clonediv").innerHTML = document.getElementById("targetdiv").innerHTML;
+            }
+
+        }, 500);
+
+
+        
+
+    </script>
+
+
+}

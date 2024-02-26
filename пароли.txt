@@ -1,0 +1,9 @@
+Авторизация на сайте
+
+"email1@re.ru", "12345", admin
+"email2@re.ru", "22222", user
+"email3@re.ru", "33333", user
+
+Авторизация в телеграм
+user1 1
+user2 2

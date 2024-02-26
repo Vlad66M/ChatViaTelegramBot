@@ -1,0 +1,11 @@
+﻿@model List<Msg>
+@{
+    var mes = Model;
+    mes.Reverse();
+}
+@foreach (Msg m in mes)
+{
+    <p>@m.SenderName: @m.Text</p>
+
+
+}
